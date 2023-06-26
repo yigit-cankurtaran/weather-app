@@ -1,29 +1,37 @@
 import { useState } from "react";
 
 async function fetchCoordinates(cityName: string) {
-  const response = await fetch(
+  // fetch geocoding data
+  const geocodingResponse = await fetch(
     `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&limit=1`
   );
-  const data = await response.json();
-  console.log(data);
-  // get "latitude" and "longitude" from data
-  const result = data.results[0];
+  const geocodingData = await geocodingResponse.json();
+
+  // get "latitude" and "longitude" from geocoding data
+  const result = geocodingData.results[0];
   const latitude = result.latitude;
   const longitude = result.longitude;
-  console.log(latitude, longitude);
+
+  // fetch weather data
+  const weatherResponse = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&current_weather=true`
+  );
+  const weatherData = await weatherResponse.json();
+
+  return weatherData;
 }
 
 function App() {
   const [cityName, setCityName] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
 
-  function formatCityName(cityName: string) {
+  async function formatCityName(cityName: string) {
     // format the city name to be all lowercase and replace spaces with underscores
-    console.log(cityName);
     cityName = cityName.toLowerCase().replace(/ /g, "_");
-    console.log(cityName);
 
-    // fetch coordinates for city
-    fetchCoordinates(cityName);
+    // fetch coordinates and weather data for city
+    const data = await fetchCoordinates(cityName);
+    setWeatherData(data);
   }
 
   return (
@@ -39,6 +47,16 @@ function App() {
       >
         Submit
       </button>
+      {weatherData && (
+        <div>
+          <h2>Current Weather:</h2>
+          <p>Temperature: {weatherData.current_weather.temperature}°C</p>
+          <p>
+            Relative Humidity: {weatherData.current_weather.relativehumidity}%
+          </p>
+          <p>Wind Speed: {weatherData.current_weather.windspeed} m/s</p>
+        </div>
+      )}
     </div>
   );
 }
