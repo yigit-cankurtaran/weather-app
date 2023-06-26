@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+async function fetchCoordinates(cityName: string) {
+  const response = await fetch(
+    `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}`
+  );
+  const data = await response.json();
+  console.log(data);
+}
+
 function App() {
   const [cityName, setCityName] = useState("");
 
@@ -8,19 +16,18 @@ function App() {
     console.log(cityName);
     cityName = cityName.toLowerCase().replace(/ /g, "_");
     console.log(cityName);
+
+    // fetch coordinates for city
+    fetchCoordinates(cityName);
   }
 
   return (
-    // create a div that centers everything in a column in the middle, use tailwind
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-4xl m-4">Hello World!</h1>
-      {/* create an input field prompting user to enter a city name */}
       <input
         className="border-2 border-gray-400 rounded-lg p-1 m-4"
         onChange={(event) => setCityName(event.target.value)}
       />
-      {/* create a button to submit the city name */}
-      {/* calls formatCityName on click */}
       <button
         className="border-2 border-gray-400 rounded-lg p-1 m-4"
         onClick={() => formatCityName(cityName)}
