@@ -2,10 +2,15 @@ import { useState } from "react";
 
 async function fetchCoordinates(cityName: string) {
   const response = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}`
+    `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&limit=1`
   );
   const data = await response.json();
   console.log(data);
+  // get "latitude" and "longitude" from data
+  const result = data.results[0];
+  const latitude = result.latitude;
+  const longitude = result.longitude;
+  console.log(latitude, longitude);
 }
 
 function App() {
