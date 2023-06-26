@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+interface WeatherData {
+  hourly: {
+    temperature_2m: number[];
+    relativehumidity_2m: number[];
+    windspeed_10m: number[];
+  };
+}
+
 async function fetchCoordinates(cityName: string) {
   // fetch geocoding data
   const geocodingResponse = await fetch(
@@ -14,16 +22,16 @@ async function fetchCoordinates(cityName: string) {
 
   // fetch weather data
   const weatherResponse = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&current_weather=true`
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,windspeed_10m`
   );
-  const weatherData = await weatherResponse.json();
+  const weatherData: WeatherData = await weatherResponse.json();
 
   return weatherData;
 }
 
-function App() {
+export default function CurrentWeather() {
   const [cityName, setCityName] = useState("");
-  const [weatherData, setWeatherData] = useState(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
 
   async function formatCityName(cityName: string) {
     // format the city name to be all lowercase and replace spaces with underscores
@@ -50,15 +58,11 @@ function App() {
       {weatherData && (
         <div>
           <h2>Current Weather:</h2>
-          <p>Temperature: {weatherData.current_weather.temperature}°C</p>
-          <p>
-            Relative Humidity: {weatherData.current_weather.relativehumidity}%
-          </p>
-          <p>Wind Speed: {weatherData.current_weather.windspeed} m/s</p>
+          <p>Temperature: {weatherData.hourly.temperature_2m[0]}°C</p>
+          <p>Relative Humidity: {weatherData.hourly.relativehumidity_2m[0]}%</p>
+          <p>Wind Speed: {weatherData.hourly.windspeed_10m[0]} m/s</p>
         </div>
       )}
     </div>
   );
 }
-
-export default App;
