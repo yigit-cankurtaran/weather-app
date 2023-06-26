@@ -1,4 +1,5 @@
 import { useState } from "react";
+import HourlyForecast from "./HourlyForecast";
 
 interface WeatherData {
   hourly: {
@@ -26,12 +27,16 @@ async function fetchCoordinates(cityName: string) {
   );
   const weatherData: WeatherData = await weatherResponse.json();
 
-  return weatherData;
+  return { latitude, longitude, weatherData };
 }
 
 export default function CurrentWeather() {
   const [cityName, setCityName] = useState("");
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [coordinates, setCoordinates] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   async function formatCityName(cityName: string) {
     // format the city name to be all lowercase and replace spaces with underscores
@@ -39,7 +44,8 @@ export default function CurrentWeather() {
 
     // fetch coordinates and weather data for city
     const data = await fetchCoordinates(cityName);
-    setWeatherData(data);
+    setWeatherData(data.weatherData);
+    setCoordinates({ latitude: data.latitude, longitude: data.longitude });
   }
 
   return (
@@ -62,6 +68,12 @@ export default function CurrentWeather() {
           <p>Relative Humidity: {weatherData.hourly.relativehumidity_2m[0]}%</p>
           <p>Wind Speed: {weatherData.hourly.windspeed_10m[0]} m/s</p>
         </div>
+      )}
+      {coordinates && (
+        <HourlyForecast
+          latitude={coordinates.latitude}
+          longitude={coordinates.longitude}
+        />
       )}
     </div>
   );
