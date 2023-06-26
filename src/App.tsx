@@ -6,7 +6,7 @@ function App() {
   function formatCityName(cityName: string) {
     // format the city name to be all lowercase and replace spaces with underscores
     console.log(cityName);
-    cityName = cityName.toLowerCase().replace(" ", "_");
+    cityName = cityName.toLowerCase().replace(/ /g, "_");
     console.log(cityName);
   }
 
