@@ -21,6 +21,7 @@ export default function HourlyForecast({
   const [forecastData, setForecastData] = useState<HourlyForecastData | null>(
     null
   );
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function fetchForecast() {
@@ -37,8 +38,13 @@ export default function HourlyForecast({
 
   return (
     <div>
-      <h2>Hourly Forecast:</h2>
-      {forecastData && (
+      <button
+        className="border-2 border-gray-400 rounded-lg p-1 m-4"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? "Hide Forecast" : "Show Forecast"}
+      </button>
+      {isOpen && forecastData && (
         <table>
           <thead>
             <tr>
